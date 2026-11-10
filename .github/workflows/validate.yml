@@ -1,0 +1,39 @@
+name: Validate
+
+permissions: {}
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+jobs:
+  hassfest:
+    name: hassfest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: home-assistant/actions/hassfest@master
+
+  hacs:
+    name: HACS validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hacs/action@main
+        with:
+          category: integration
+          ignore: brands
+
+  panel:
+    name: Panel syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --check custom_components/rbgrid/panel/rbgrid-panel.js
+      - run: python3 -c "import json,glob; [json.load(open(f)) for f in glob.glob('custom_components/rbgrid/**/*.json', recursive=True) + ['hacs.json']]; print('json ok')"

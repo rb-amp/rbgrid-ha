@@ -1,0 +1,77 @@
+set_prices:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: rbgrid
+    prices:
+      required: false
+      example: '[{"buy": 0.112, "sell": 0.04, "from": 1794139200, "until": 1794142800}]'
+      selector:
+        object:
+    buy:
+      required: false
+      example: 0.112
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: any
+          mode: box
+    sell:
+      required: false
+      example: 0.04
+      selector:
+        number:
+          min: 0
+          max: 100
+          step: any
+          mode: box
+    from:
+      required: false
+      example: 1794139200
+      selector:
+        number:
+          min: 0
+          max: 4102444800
+          step: 1
+          mode: box
+    until:
+      required: false
+      example: 1794142800
+      selector:
+        number:
+          min: 0
+          max: 4102444800
+          step: 1
+          mode: box
+
+clear_prices:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: rbgrid
+
+command:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: rbgrid
+    command:
+      required: true
+      example: '{"cmd": "get", "section": "sensors"}'
+      selector:
+        object:
+
+import_statistics:
+  fields:
+    config_entry_id:
+      required: false
+      selector:
+        config_entry:
+          integration: rbgrid

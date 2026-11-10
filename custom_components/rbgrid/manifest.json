@@ -1,0 +1,31 @@
+{
+  "domain": "rbgrid",
+  "name": "RBgrid",
+  "after_dependencies": [
+    "energy",
+    "zeroconf"
+  ],
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [
+    "esphome",
+    "frontend",
+    "http",
+    "websocket_api",
+    "recorder"
+  ],
+  "documentation": "https://github.com/rb-amp/rbgrid-ha",
+  "integration_type": "hub",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/rb-amp/rbgrid-ha/issues",
+  "requirements": [],
+  "version": "0.2.7",
+  "zeroconf": [
+    {
+      "type": "_esphomelib._tcp.local.",
+      "properties": {
+        "project_name": "rbgrid*"
+      }
+    }
+  ]
+}

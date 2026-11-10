@@ -1,0 +1,86 @@
+blueprint:
+  name: RBgrid — notify on hub events
+  description: >-
+    Sends a notification when the RBgrid hub reports an event (reverse flow, a
+    module or ESP-NOW node going absent or coming back, a stuck I2C bus, a
+    firmware rollback…). Events arrive on the Home Assistant bus as
+    `esphome.rbgrid_event` with `kind`, `level` and `message`; pick the kinds
+    you care about.
+  domain: automation
+  source_url: https://github.com/rb-amp/rbgrid-ha/blob/main/blueprints/automation/rbgrid/event_notify.yaml
+  author: RBgrid
+  input:
+    hub:
+      name: Hub
+      description: The RBgrid hub device (leave empty for every hub).
+      default: ""
+      selector:
+        device:
+          filter:
+            - integration: esphome
+              manufacturer: rbgrid
+    kinds:
+      name: Event kinds
+      description: Which kinds trigger the notification.
+      default:
+        - reverse_flow
+        - module_absent
+        - module_restored
+        - node_offline
+        - node_online
+        - bus_stuck
+        - firmware
+        - fail
+      selector:
+        select:
+          multiple: true
+          custom_value: true
+          options:
+            - reverse_flow
+            - module_absent
+            - module_restored
+            - module_poll_fail
+            - bus_stuck
+            - node_online
+            - node_offline
+            - boot
+            - tariff
+            - firmware
+            - fail
+            - event
+    notify_action:
+      name: Notification action
+      description: Any `notify.*` action, e.g. notify.mobile_app_my_phone.
+      default: notify.notify
+      selector:
+        text:
+    title:
+      name: Title
+      default: "RBgrid: {{ trigger.event.data.kind }}"
+      selector:
+        text:
+
+mode: queued
+max: 20
+
+triggers:
+  - trigger: event
+    event_type: esphome.rbgrid_event
+
+conditions:
+  - condition: template
+    value_template: >-
+      {{ trigger.event.data.kind in (kinds | default([]))
+         and (hub == '' or trigger.event.data.device_id == hub) }}
+
+variables:
+  hub: !input hub
+  kinds: !input kinds
+
+actions:
+  - action: !input notify_action
+    data:
+      title: !input title
+      message: >-
+        {{ trigger.event.data.message }}
+        ({{ trigger.event.data.level }}, {{ now().strftime('%H:%M:%S') }})

@@ -1,0 +1,125 @@
+{
+  "title": "RBgrid",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Choose the RBgrid hub",
+        "description": "Hubs are ESPHome devices with the rbgrid component that Home Assistant has already adopted. Add the hub through the ESPHome integration first if it is not listed.",
+        "data": {
+          "mac": "Hub"
+        }
+      },
+      "esphome_missing": {
+        "title": "Waiting for the ESPHome integration",
+        "description": "{name} is an ESPHome device. Home Assistant must adopt it through the ESPHome integration first (it shows up as “Discovered” on this page too). Add it there, then press Submit here."
+      },
+      "options": {
+        "title": "Set up {name}",
+        "description": "{model} · {sw}. The RBgrid panel appears in the sidebar and the hub's hourly history is imported into long-term statistics automatically.",
+        "data": {
+          "setup_energy": "Configure the Energy dashboard with this hub (grid import/export, cost and export value from the hub, every point as an individual device)",
+          "sync_currency": "Set the hub's tariff plan to Home Assistant's currency ({currency}) — the hub and Home Assistant must use one currency, there is no conversion"
+        }
+      }
+    },
+    "abort": {
+      "no_hubs": "No RBgrid hub found among the ESPHome devices. Add the hub through the ESPHome integration first.",
+      "all_configured": "Every RBgrid hub in Home Assistant is already configured.",
+      "already_configured": "This hub is already configured.",
+      "no_mac": "The discovered device did not report a MAC address."
+    },
+    "flow_title": "{name}",
+    "create_entry": {
+      "default": "{name} is set up. The **RBgrid Hub** panel is in the sidebar (also at /rbgrid); the hub's own device page offers *Visit* to open it. Statistics import starts within a minute; the Energy dashboard shows the hub after the next full hour."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "RBgrid options",
+        "description": "Hub: {name}",
+        "data": {
+          "price_entity": "Price sensor pushed to the hub as external price (Nord Pool, ENTSO-e, Tibber… — leave empty to use the hub's tariff plan only)",
+          "price_unit": "Unit of that sensor",
+          "setup_energy": "Configure the Energy dashboard with this hub again",
+          "sync_currency": "Write Home Assistant's currency ({currency}) into the hub's tariff plan now"
+        }
+      }
+    }
+  },
+  "selector": {
+    "price_unit": {
+      "options": {
+        "major": "Currency per kWh (e.g. EUR/kWh)",
+        "cents": "Cents per kWh",
+        "mwh": "Currency per MWh (e.g. EUR/MWh, core Nord Pool action results)"
+      }
+    }
+  },
+  "services": {
+    "set_prices": {
+      "name": "Set external prices",
+      "description": "Send energy prices to the hub; each entry replaces the tariff zone's energy rate for its time range (fees and VAT of the plan still apply).",
+      "fields": {
+        "config_entry_id": {
+          "name": "Hub",
+          "description": "Which hub (only needed with several)."
+        },
+        "prices": {
+          "name": "Prices",
+          "description": "List of entries with buy, sell (optional), from and until (unix seconds); up to 192 entries."
+        },
+        "buy": {
+          "name": "Buy price",
+          "description": "One price per kWh (alternative to the list)."
+        },
+        "sell": {
+          "name": "Sell price",
+          "description": "Feed-in price per kWh (optional)."
+        },
+        "from": {
+          "name": "From",
+          "description": "Unix time the price starts."
+        },
+        "until": {
+          "name": "Until",
+          "description": "Unix time the price ends."
+        }
+      }
+    },
+    "clear_prices": {
+      "name": "Clear external prices",
+      "description": "Drop every external price; the tariff plan applies again.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Hub",
+          "description": "Which hub (only needed with several)."
+        }
+      }
+    },
+    "command": {
+      "name": "Send a command",
+      "description": "Run one rbgrid_cmd command (JSON object) and return the device reply with parts reassembled.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Hub",
+          "description": "Which hub (only needed with several)."
+        },
+        "command": {
+          "name": "Command",
+          "description": "The command object, for example cmd: get, section: sensors."
+        }
+      }
+    },
+    "import_statistics": {
+      "name": "Import history into statistics",
+      "description": "Import the hub's stored hourly history into long-term statistics now.",
+      "fields": {
+        "config_entry_id": {
+          "name": "Hub",
+          "description": "Which hub (only needed with several)."
+        }
+      }
+    }
+  }
+}
