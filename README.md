@@ -121,6 +121,22 @@ not a lost configuration). `Modules online`, `Nodes online` and each point's `On
 device within a second and make good blueprint triggers; the event stream carries the reason text.
 Statistics stayed consistent across disconnects, an OTA rollback and serial resets.
 
+## Cheap windows as entities
+
+With a hub on dynamic prices the integration adds its own entities to the hub's device, refreshed
+every minute and right after every price event of the hub:
+
+| entity | meaning |
+|---|---|
+| `binary_sensor.<hub>_<rule>_window` — one per rule | on while that cheap window is active; attributes `active_until`, `next_start`, `rule_id` |
+| `binary_sensor.<hub>_price_cheap` | the hub's "cheap" flag (buy price below the threshold you set) |
+| `binary_sensor.<hub>_sell_price_low` | the hub's "sell low" flag |
+| `sensor.<hub>_price_rank_today` | rank of the current buy price among today's periods (1 = cheapest); attributes `periods_today`, `rank_sell` |
+
+The hub computes the windows and switches nothing; an automation in Home Assistant does — one state
+condition on the window sensor, no templates. A second blueprint, *RBgrid — cheap window turns a
+switch on and off*, ships in `blueprints/` for exactly that.
+
 ## Entity ids
 
 Home Assistant builds entity ids once, at first adoption, and point sub-devices come out as

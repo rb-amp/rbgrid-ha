@@ -1,0 +1,56 @@
+blueprint:
+  name: RBgrid — cheap window turns a switch on and off
+  description: >-
+    Turns a switch (or light, fan, input_boolean) on while a cheap window of the RBgrid hub is
+    active and off when it ends. The hub computes the window from its prices and only reports it
+    (binary sensor "<rule name> window"); the switching is done here, by this automation.
+  domain: automation
+  source_url: https://github.com/rb-amp/rbgrid-ha/blob/main/blueprints/automation/rbgrid/window_switch.yaml
+  author: RBgrid
+  input:
+    window:
+      name: Cheap window
+      description: The hub's window sensor for the rule (Prices tab → Cheap windows).
+      selector:
+        entity:
+          filter:
+            - integration: rbgrid
+              domain: binary_sensor
+    target:
+      name: What to switch
+      selector:
+        entity:
+          filter:
+            - domain:
+                - switch
+                - light
+                - fan
+                - input_boolean
+    invert:
+      name: Invert
+      description: Turn the target off while the window is active (and on when it ends).
+      default: false
+      selector:
+        boolean:
+mode: restart
+triggers:
+  - trigger: state
+    entity_id: !input window
+    to:
+      - "on"
+      - "off"
+variables:
+  invert: !input invert
+  active: "{{ trigger.to_state.state == 'on' }}"
+actions:
+  - if:
+      - condition: template
+        value_template: "{{ active != invert }}"
+    then:
+      - action: homeassistant.turn_on
+        target:
+          entity_id: !input target
+    else:
+      - action: homeassistant.turn_off
+        target:
+          entity_id: !input target

@@ -58,7 +58,17 @@ async def async_setup_energy(hass: HomeAssistant, hub: RbgridHub) -> dict[str, A
         "cost_adjustment_day": 0,
     }
 
-    # Individual devices: one per point sub-device that has an Energy in sensor
+    # Individual devices: one per point sub-device that has an Energy in sensor — loads only. Supply points (the grid
+    # input, split per phase or not) are the grid source already; renewable and storage points are not consumption.
+    not_devices = {"MAIN_SUPPLY", "ALTERNATIVE_SUPPLY", "RENEWABLE_SOURCE", "STORAGE_SYSTEM"}
+    roles: dict[str, str] = {}
+    try:
+        units = await hub.async_get("units")
+        while isinstance(units, dict) and isinstance(units.get("data"), dict) and "units" not in units:
+            units = units["data"]
+        roles = {str(u.get("name")): str(u.get("role")) for u in (units.get("units") or []) if isinstance(u, dict)}
+    except Exception:  # noqa: BLE001 — hub offline: fall back to "every named point", as before
+        _LOGGER.debug("RBgrid %s: unit roles unavailable for the Energy setup", hub.name, exc_info=True)
     devices: list[dict[str, Any]] = []
     slot_stats: set[str] = set()  # every slot's Energy in sensor, bound or not: stale entries from an earlier setup go
     for device in dr.async_entries_for_config_entry(dev_reg, hub.esphome_entry_id):
@@ -70,6 +80,8 @@ async def async_setup_energy(hass: HomeAssistant, hub: RbgridHub) -> dict[str, A
         name_ent = next((e for e in ents if e.unique_id.endswith("/text_sensor/Name")), None)
         name_state = hass.states.get(name_ent.entity_id) if name_ent else None
         if not name_state or name_state.state in ("", "unknown", "unavailable"):
+            continue
+        if roles.get(name_state.state) in not_devices:
             continue
         for ent in ents:
             if ent.domain == "sensor" and ent.unique_id.endswith("/sensor/Energy in"):

@@ -49,7 +49,7 @@ const STR = {
     boundInputs: "Bound inputs", reusePoint: "Reuse a retired point (its history comes back)", retiredPoint: "Retired point to bring back", hRetiredPoint: "The device keeps the ids of deleted points; pick the one this point continues. The name you enter above is kept.", noRetired: "No retired points on this hub. Deleted points can be brought back here.", hReuse: "A deleted point keeps its id reserved so its history is not mixed up; tick to continue one of them, otherwise the new point gets a fresh id.", tombstoned: "This id belongs to a deleted point. Tick “Reuse a retired point” and pick it to bring it back, or choose another name.", code_POINT_TAKEN: "This name is already used by another point.", code_SENSOR_BOUND: "This sensor channel already feeds a point — rebind or delete that point first.", code_ROLE_SUPPLY_LOCKED: "A supply point's role cannot be changed here.", code_NOT_PHASE_MODULE: "This module has no per-phase inputs, so a phase cannot be assigned.",
     signalFlags: "Signal thresholds", buyCheapBelow: "“Cheap” when buy below", sellLowBelow: "“Sell low” when sell below", peaks: "Import peaks (capacity tariff)", cycleDay: "Billing cycle starts on day", max15: "Highest 15-min average", maxHour: "Highest hour", top3: "Mean of the 3 highest days", noDyn: "This hub's firmware has no dynamic-price support; only the Home Assistant push below applies.",
     save: "Save", cancel: "Cancel", apply: "Apply", close: "Close", shortName: "Short name", ratedPower: "Rated power, W", maxCurrent: "Max current, A", phase: "Phase",
-    invertSign: "Invert sign", groupId: "Group", module: "Module", channel: "Channel", sensor: "Sensor channel", created: "Point created", saved: "Saved", deleted: "Point deleted",
+    invertSign: "Invert sign", ctModel: "CT clamp model", hCtModel: "The current clamp on this channel; the hub recalculates with the new model at once. Needs a calibrated module — otherwise the hub refuses and says so.", groupId: "Group", module: "Module", channel: "Channel", sensor: "Sensor channel", created: "Point created", saved: "Saved", deleted: "Point deleted",
     plan: "Plan", provider: "Provider", type: "Type", currency: "Currency", vat: "VAT, %", energyTax: "Energy tax /kWh", gridFee: "Grid fee /kWh", levy: "Renewable levy /kWh",
     zones: "Zones", zoneId: "Zone", buy: "Buy /kWh", sell: "Sell /kWh", conditions: "Conditions", enabled: "Enabled", active: "active now", placeholder: "This is the device's demo plan — replace it with your supplier's rates.",
     advanced: "Advanced: edit the plan as JSON", invalidJson: "Invalid JSON", tariffSaved: "Tariff plan applied", allIn: "all-in (fees + VAT)",
@@ -99,7 +99,7 @@ const STR = {
     boundInputs: "Привязано входов", reusePoint: "Вернуть удалённую точку (вернётся её история)", retiredPoint: "Какую удалённую точку вернуть", hRetiredPoint: "Устройство хранит идентификаторы удалённых точек; выберите ту, которую продолжает эта точка. Имя, введённое выше, сохраняется.", noRetired: "Удалённых точек на этом хабе нет. Здесь можно вернуть удалённую точку.", hReuse: "Удалённая точка сохраняет свой идентификатор, чтобы её история не смешалась; отметьте, чтобы продолжить одну из них, иначе новая точка получит новый идентификатор.", tombstoned: "Этот идентификатор принадлежит удалённой точке. Отметьте «Вернуть удалённую точку» и выберите её, либо укажите другое имя.", code_POINT_TAKEN: "Это имя уже занято другой точкой.", code_SENSOR_BOUND: "Этот канал датчика уже привязан к точке — сначала перепривяжите или удалите её.", code_ROLE_SUPPLY_LOCKED: "Роль точки ввода здесь изменить нельзя.", code_NOT_PHASE_MODULE: "У этого модуля нет пофазных входов, фазу назначить нельзя.",
     signalFlags: "Пороги сигнала", buyCheapBelow: "«Дёшево», когда покупка ниже", sellLowBelow: "«Продажа низкая», когда продажа ниже", peaks: "Пики потребления (тариф за мощность)", cycleDay: "Расчётный период начинается с числа", max15: "Наибольшее 15-мин среднее", maxHour: "Наибольший час", top3: "Среднее 3 наибольших дней", noDyn: "Прошивка этого хаба не поддерживает динамические цены; действует только отправка из Home Assistant ниже.",
     save: "Сохранить", cancel: "Отмена", apply: "Применить", close: "Закрыть", shortName: "Короткое имя", ratedPower: "Номинальная мощность, Вт", maxCurrent: "Макс. ток, А", phase: "Фаза",
-    invertSign: "Инвертировать знак", groupId: "Группа", module: "Модуль", channel: "Канал", sensor: "Канал датчика", created: "Точка создана", saved: "Сохранено", deleted: "Точка удалена",
+    invertSign: "Инвертировать знак", ctModel: "Модель токовых клещей", hCtModel: "Клещи на этом канале; хаб сразу пересчитывает с новой моделью. Нужен откалиброванный модуль — иначе хаб откажет и скажет об этом.", groupId: "Группа", module: "Модуль", channel: "Канал", sensor: "Канал датчика", created: "Точка создана", saved: "Сохранено", deleted: "Точка удалена",
     plan: "План", provider: "Поставщик", type: "Тип", currency: "Валюта", vat: "НДС, %", energyTax: "Налог на энергию /кВт·ч", gridFee: "Сетевой сбор /кВт·ч", levy: "Сбор ВИЭ /кВт·ч",
     zones: "Зоны", zoneId: "Зона", buy: "Покупка /кВт·ч", sell: "Продажа /кВт·ч", conditions: "Условия", enabled: "Включена", active: "активна сейчас", placeholder: "Это демо-план устройства — замените его тарифами вашего поставщика.",
     advanced: "Расширенно: править план как JSON", invalidJson: "Некорректный JSON", tariffSaved: "Тарифный план применён", allIn: "полная (сборы + НДС)",
@@ -645,7 +645,7 @@ ${(en.nodes || []).map((n) => `<tr class="${n.disabled ? "dim" : ""}"><td>${esc(
 
   _r_history() {
     const h = this.s.hist; const units = this._unitList(); const ser = h.series; const cur = ser?.currency || this._currency();
-    const rows = (ser?.rows || []).slice().reverse(); const idx = {}; (ser?.cols || []).forEach((c, i) => (idx[c] = i));
+    const idx = {}; (ser?.cols || []).forEach((c, i) => (idx[c] = i)); const rows = (ser?.rows || []).filter((r) => (r[idx.dur] || 0) > 0 && Math.abs(r[idx.wh_in] || 0) < 1e8 && Math.abs(r[idx.wh_out] || 0) < 1e8).slice().reverse(); // skip 0-second / implausible rows (a fresh hub once served -2^40 Wh)
     const anyData = rows.some((r) => (r[idx.wh_in] || 0) > 0 || (r[idx.wh_out] || 0) > 0 || (r[idx.cost] || 0) > 0);
     let chart = "";
     if (rows.length && anyData) {
@@ -870,6 +870,8 @@ ${list.map((r) => `<tr class="${r.enabled === false ? "dim" : ""}"><td><input ty
 <label class="f">${this.t("maxCurrent")}<input type="number" step="0.1" name="max_current_a" value="${u.max_current_a ?? ""}" min="0">${hint("hMaxCur")}</label>
 <label class="f">${this.t("groupId")}<input type="number" name="group_id" value="${u.group_id ?? 0}" min="0">${hint("hGroup")}</label>
 <label class="f"><span class="c"><input type="checkbox" name="invert_sign" ${u.sources?.[0]?.invert_sign ? "checked" : ""}> ${this.t("invertSign")}</span>${hint("hInvert")}</label>
+${(() => { const sn = (this.s.data.sensors?.sensors || []).find((x) => x.unit_id === u.hex); const md = sn && (this.s.data.sensors?.modules || []).find((m) => m.module === sn.module); const models = en.ct_model || {};
+  return sn && md?.ct_settable && Object.keys(models).length ? `<label class="f">${this.t("ctModel")}<select name="ct_code">${Object.entries(models).map(([k, v]) => `<option value="${esc(k)}" ${Number(k) === Number(sn.ct_code) ? "selected" : ""}>${esc(v)}</option>`).join("")}</select>${hint("hCtModel")}</label>` : ""; })()}
 </div>`;
     } else if (d.kind === "rebind") {
       title = `${this.t("rebind")} · ${esc(u.name)}`;
@@ -979,12 +981,13 @@ ${r.kind !== "threshold" ? `<label class="f">${this.t("durationSel")}${dur(r.per
         for (const k of ["name", "short_name", "role"]) if (v(k) !== null && v(k) !== (k === "short_name" ? u.short_name || "" : u[k])) data[k] = v(k);
         for (const k of ["rated_power_w", "max_current_a", "group_id", "phase"]) { const n = num(v(k)); if (n !== null && n !== Number(u[k])) data[k] = n; }
         const inv = fd.get("invert_sign") === "on"; if (inv !== Boolean(u.sources?.[0]?.invert_sign)) data.invert_sign = inv;
+        const ctNow = (this.s.data.sensors?.sensors || []).find((x) => x.unit_id === u.hex)?.ct_code; const ctNew = v("ct_code"); if (ctNew !== null && ctNow !== undefined && Number(ctNew) !== Number(ctNow)) data.ct_code = Number(ctNew);
         if (Object.keys(data).length) {
           try { await this._call({ cmd: "unit", op: "patch", unit: hex, data }); }
           catch (err) { throw new Error(this._friendlyErr(err.message, (e) => (e.code === "POINT_TOMBSTONED" && data.reuse ? e.text : null))); }
           await new Promise((r) => setTimeout(r, 1500));
         }
-        this.s.dialog = null; this.s.msg = this.t("saved"); this._invalidate("units", "tele"); await this._loadTab();
+        this.s.dialog = null; this.s.msg = this.t("saved"); this._invalidate("units", "tele", "sensors"); await this._loadTab();
       } else if (kind === "rebind") {
         const [module, ch] = String(v("sensor")).split(":").map(Number);
         await this._call({ cmd: "unit", op: "rebind", unit: hex, data: { module, ch } });

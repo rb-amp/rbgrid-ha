@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 DOMAIN = "rbgrid"
-VERSION = "0.2.7"
+VERSION = "0.2.8"
 
 # Config entry data
 CONF_DEVICE_ID = "device_id"  # HA device registry id of the hub device
@@ -40,4 +40,5 @@ GET_CACHE_TTL = 15.0
 # Reply over this many bytes comes in base64 parts (device rule, informational)
 PARTS_THRESHOLD = 4000
 
+PLATFORMS = ["binary_sensor", "sensor"]  # the integration's own entities (cheap windows, price flags, rank)
 SIGNAL_EVENT = f"{DOMAIN}_event_{{}}"  # .format(entry_id)

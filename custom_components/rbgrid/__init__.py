@@ -34,6 +34,7 @@ from homeassistant.helpers.typing import ConfigType
 from . import services, websocket
 from .config_flow import async_find_hubs
 from .const import (
+    PLATFORMS,
     CONF_DEVICE_ID,
     CONF_ESPHOME_ENTRY_ID,
     CONF_MAC,
@@ -51,6 +52,7 @@ from .const import (
     STATIC_URL,
     VERSION,
 )
+from .signal import RbgridSignalCoordinator
 from .hub import RbgridHub
 
 _LOGGER = logging.getLogger(__name__)
@@ -114,6 +116,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: RbgridConfigEntry) -> bo
     entry.runtime_data = hub
     await hub.async_start()
     await _async_ensure_panel(hass)
+    # Cheap windows / price flags / rank as entities: polled every minute and on price events
+    hub.signal = RbgridSignalCoordinator(hass, hub)
+    await hub.signal.async_refresh()  # no raise: a hub without dynamic prices or offline just has no data yet
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # The hub itself belongs to the ESPHome entry (a device has one owner), so the integration gets
     # its own small service device: it gives the integration page a device link and a "Visit" button
@@ -232,6 +238,7 @@ async def _async_update_listener(hass: HomeAssistant, entry: RbgridConfigEntry) 
 
 async def async_unload_entry(hass: HomeAssistant, entry: RbgridConfigEntry) -> bool:
     """Unload one hub; drop the panel with the last loaded one."""
+    await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     await entry.runtime_data.async_stop()
     others = [e for e in hass.config_entries.async_loaded_entries(DOMAIN) if e.entry_id != entry.entry_id]
     if not others and hass.data.get(_PANEL):

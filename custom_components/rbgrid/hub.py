@@ -131,6 +131,7 @@ class RbgridHub:
     firmware: dict[str, Any] = field(default_factory=dict)  # from boot/fw log lines: image, partition, boot, reset
     _replay_task: Any = None
     runtime_options: Any = None  # options the running hub was built with (see __init__._runtime_options)
+    signal: Any = None  # signal.RbgridSignalCoordinator (cheap windows / flags / rank), set by async_setup_entry
 
     @classmethod
     def from_entry(cls, hass: HomeAssistant, entry: ConfigEntry) -> RbgridHub:

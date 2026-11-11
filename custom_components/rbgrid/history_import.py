@@ -39,6 +39,7 @@ _LOGGER = logging.getLogger(__name__)
 
 HOUR = 3600
 SERIES_LIMIT = 720  # device cap
+_MAX_PER_HOUR = {"wh_in": 1e8, "wh_out": 1e8, "cost": 1e6, "revenue": 1e6}  # per-hour sanity caps
 
 _KINDS: dict[str, tuple[str, str]] = {
     # key: (series column, label)
@@ -67,6 +68,11 @@ def aggregate_hours(cols: list[str], rows: list[list[Any]]) -> dict[int, dict[st
     for row in rows:
         ts, dur = int(row[idx["ts"]]), int(row[idx["dur"]])
         if dur <= 0:
+            continue
+        # A fresh hub once served a 0-second row with wh_in = -2^40 (uninitialised accumulator); the duration check
+        # above drops that one, this drops anything else physically impossible for a single hour.
+        if any(abs(float(row[idx[c]] or 0)) > _MAX_PER_HOUR[c] for c in ("wh_in", "wh_out", "cost", "revenue") if c in idx):
+            _LOGGER.debug("series row skipped as implausible: %s", row)
             continue
         bucket = out[_hour_start(ts, dur)]
         for kind, (col, _) in _KINDS.items():

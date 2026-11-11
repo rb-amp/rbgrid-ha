@@ -3,6 +3,12 @@
 All notable changes to the RBgrid Home Assistant integration. Dates are the day the change reached the test
 installation; versions follow `custom_components/rbgrid/manifest.json`.
 
+## 0.2.8 — 2026-11-11
+- Energy dashboard setup adds only load points as individual devices: supply points (the grid input, also when split per phase), renewable and storage points are left out — they are the grid source or not consumption.
+- Cheap windows as entities: a binary sensor per rule ("<rule> window", on while active, with `active_until` / `next_start`), "Price cheap" and "Sell price low" flags and a "Price rank today" sensor, on the hub's device, refreshed every minute and on every price event. New blueprint *cheap window turns a switch on and off*. Hubs without dynamic prices get none of these.
+- Points: the Edit dialog offers the **CT clamp model** of the point's channel (models from the hub's own list) when the module allows it; the hub applies it at once or refuses with its reason (uncalibrated module). Until now this was only reachable through the `rbgrid.command` action.
+- History / statistics import: 0-second and physically impossible series rows are skipped (a fresh hub once served a 0 s row with −2^40 Wh); the import already ignored 0 s rows, the panel's History table now does too.
+
 ## 0.2.7 — 2026-11-10
 - A hub that answers `[code=STARTING]` — firmware refusing commands while its core is still coming up, typically in the first seconds after an OTA — is retried a few times instead of surfacing an error; the panel's text for the rare leftover case says to try again.
 - Panel: "Reuse a retired point" lets you pick which deleted point the new one continues, from the list the device keeps (`point_tombstones`); the device reclaims a retired point only when its id is named, so the earlier checkbox had no effect. The edit dialog no longer offers it: a rename never changes a point's id.
